@@ -10,11 +10,13 @@ function main() {
     // Draw our line
     var material = new THREE.LineBasicMaterial({color: 0xBADA55})
     var geometry = new THREE.Geometry()
-    var lineVector1 = new THREE.Vector3(0, -10, 0)
-    var lineVector2 = new THREE.Vector3(0, 10, 0)
-    geometry.vertices.push(lineVector1, lineVector2)
-    var line = new THREE.Line(geometry, material)
-    scene.add(line)
+    var line = new THREE.Line3(
+        new THREE.Vector3(0, -10, 0),
+        new THREE.Vector3(0, 10, 0)
+    )
+    geometry.vertices.push(line.start, line.end)
+    var axis = new THREE.Line(geometry, material)
+    scene.add(axis)
 
     // Create a parent for the points
     pointsContainer = new THREE.Object3D()
@@ -36,7 +38,7 @@ function main() {
         sphere.position.set(point.x, point.y, point.z)
         pointsContainer.add(sphere)
 
-        var distance = calculateDistance(point, lineVector1, lineVector2)
+        var distance = calculateDistance(point, line.start, line.end)
         if (!closestDistance || distance < closestDistance) {
             closestDistance = distance
             closestSphere = sphere
