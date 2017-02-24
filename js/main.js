@@ -8,7 +8,7 @@ function main() {
     document.body.appendChild(renderer.domElement)
 
     // Draw our line
-    var material = new THREE.LineBasicMaterial({ color: 0xBADA55 })
+    var material = new THREE.LineBasicMaterial({color: 0xBADA55})
     var geometry = new THREE.Geometry()
     var lineVector1 = new THREE.Vector3(0, -10, 0)
     var lineVector2 = new THREE.Vector3(0, 10, 0)
@@ -20,41 +20,34 @@ function main() {
     pointsContainer = new THREE.Object3D()
     scene.add(pointsContainer)
 
-    // First pass to generate points and calculate the closest
-    var points = []
-    var closestIndex = 0
+    // Generate our points and determine the closest to our line
     var closestDistance
-    for(var i=0; i<10; i++) {
+    var closestSphere
+    for(var i=0;i<10; i++) {
         var point = new THREE.Vector3(
             Math.random()*10 - 5, 
             Math.random()*10 - 5, 
             Math.random()*10 - 5
         )
 
-        var distance = calculateDistance(point, lineVector1, lineVector2)
-        if (!closestDistance || distance < closestDistance) {
-            closestDistance = distance
-            closestIndex = i
-        }
-
-        points.push(point)
-    }
-
-    // Second pass to add our points and visually distinguish the closest
-    for(var i=0;i<points.length; i++) {
-        var mat = new THREE.MeshBasicMaterial({
-            color: (i == closestIndex) ? 0xBADA55 : 0xCCCCCC
-        })
-        var point = points[i]
+        var mat = new THREE.MeshBasicMaterial({color: 0xCCCCCC})
         var sphereGeometry = new THREE.SphereGeometry(0.2, 32, 32)
         var sphere = new THREE.Mesh(sphereGeometry, mat)
         sphere.position.set(point.x, point.y, point.z)
         pointsContainer.add(sphere)
-    }
 
+        var distance = calculateDistance(point, lineVector1, lineVector2)
+        if (!closestDistance || distance < closestDistance) {
+            closestDistance = distance
+            closestSphere = sphere
+        }
+    }
+    closestSphere.material.color.setHex(0xBADA55)
+
+    // Render loop
     var cameraRotation = 0
     function render() {
-        requestAnimationFrame( render )
+        requestAnimationFrame(render)
         cameraRotation -= 0.01
         pointsContainer.rotation.y = cameraRotation
         renderer.render(scene, camera)
